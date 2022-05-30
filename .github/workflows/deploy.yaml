@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: pyodide/pyodide:0.20.0
+      image: ghcr.io/pyodide/pyodide:0.20.0
       volumes:
       - ${{ github.workspace }}:/src/otio-wasm
 
