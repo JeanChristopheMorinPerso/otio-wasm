@@ -10,6 +10,7 @@
 
       <input type="file" id="otio-file" hidden=true/>
       <div id="svg-div"></div>
+      <p id="status">Loading...</p>
     </div>
 
     <script type="text/javascript">
@@ -18,13 +19,15 @@
         async function main(){
             let pyodide = await loadPyodide();
 
-            await pyodide.loadPackage('http://localhost:8000/OpenTimelineIO-0.15.0.dev1-cp310-cp310-emscripten_wasm32.whl');
-
-            // pyodide.runPython(`import opentimelineio.adapters`);
+            await pyodide.loadPackage('https://jcmorin.dev/otio-wasm/OpenTimelineIO-0.15.0.dev1-cp310-cp310-emscripten_wasm32.whl');
 
             document.getElementById("otio-file").hidden = false;
+            document.getElementById('status').hidden = true;
 
             document.getElementById("otio-file").onchange = function() {
+                document.getElementById('status').innerText = "Converting OTIO to SVG..."
+                document.getElementById('status').hidden = false;
+
                 const otioFile = document.getElementById("otio-file").files[0];
 
                 console.log(otioFile.name);
@@ -47,6 +50,7 @@
                     svgElem.setAttribute("viewBox", `0 0 ${svgElem.getAttribute("width")} ${svgElem.getAttribute("height")}`);
                     svgElem.removeAttribute('height');
                     svgElem.removeAttribute('width');
+                    document.getElementById('status').hidden = true;
                 }
             }
       }
