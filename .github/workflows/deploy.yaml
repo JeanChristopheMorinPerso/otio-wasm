@@ -12,9 +12,11 @@ jobs:
       image: ghcr.io/pyodide/pyodide:0.20.0
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Clone self
+      uses: actions/checkout@v3
 
-    - uses: actions/checkout@v3
+    - name: Clone OpenTimelineIO
+      uses: actions/checkout@v3
       with:
         repository: AcademySoftwareFoundation/OpenTimelineIO
         path: otio-repo
@@ -34,3 +36,24 @@ jobs:
 
     - name: Build wasm wheel
       run: ./build.sh $(pwd)
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: wheel
+        path: /src/pyodide/packages/opentimelineio/dist/*.whl
+
+  publish:
+    needs: ['build']
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/download-artifact@v3
+      with:
+        name: wheel
+        path: public
+
+    - uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: public

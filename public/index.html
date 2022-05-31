@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="container-fluid">
+      <p>OpenTimelineIO SVG viewer. This page is powered by Pyodide.</p>
+
+      <input type="file" id="otio-file" hidden=true/>
+      <div id="svg-div"></div>
+      <p id="status">Loading...</p>
+    </div>
+
+    <script type="text/javascript">
+        var content = null;
+
+        async function main(){
+            let pyodide = await loadPyodide();
+
+            await pyodide.loadPackage('https://jcmorin.dev/otio-wasm/OpenTimelineIO-0.15.0.dev1-cp310-cp310-emscripten_wasm32.whl');
+
+            document.getElementById("otio-file").hidden = false;
+            document.getElementById('status').hidden = true;
+
+            document.getElementById("otio-file").onchange = function() {
+                document.getElementById('status').innerText = "Converting OTIO to SVG..."
+                document.getElementById('status').hidden = false;
+
+                const otioFile = document.getElementById("otio-file").files[0];
+
+                console.log(otioFile.name);
+                const reader = new FileReader();
+                reader.readAsBinaryString(otioFile);
+
+                reader.onload = evt => {
+                    content = evt.target.result;
+
+                    var output = pyodide.runPython(`
+                        import js
+                        import opentimelineio
+
+                        timeline = opentimelineio.adapters.read_from_string(js.content)
+                        opentimelineio.adapters.write_to_string(timeline, adapter_name='svg')
+                    `)
+
+                    document.getElementById('svg-div').innerHTML = output;
+                    svgElem = document.getElementsByTagName('svg')[0];
+                    svgElem.setAttribute("viewBox", `0 0 ${svgElem.getAttribute("width")} ${svgElem.getAttribute("height")}`);
+                    svgElem.removeAttribute('height');
+                    svgElem.removeAttribute('width');
+                    document.getElementById('status').hidden = true;
+                }
+            }
+      }
+
+      main();
+    </script>
+  </body>
+</html>
