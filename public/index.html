@@ -46,10 +46,15 @@
                     `)
 
                     document.getElementById('svg-div').innerHTML = output;
-                    svgElem = document.getElementsByTagName('svg')[0];
-                    svgElem.setAttribute("viewBox", `0 0 ${svgElem.getAttribute("width")} ${svgElem.getAttribute("height")}`);
+
+                    const svgElem = document.getElementsByTagName('svg')[0];
+
                     svgElem.removeAttribute('height');
                     svgElem.removeAttribute('width');
+
+                    const {x, y, width, height} = svgElem.getBBox();
+                    svgElem.setAttribute("viewBox", `${x} ${y} ${width + 20} ${height + 20}`);
+
                     document.getElementById('status').hidden = true;
                 }
             }
