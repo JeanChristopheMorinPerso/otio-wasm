@@ -1,32 +1,86 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
       <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
   </head>
   <body>
+    <nav class="navbar navbar-expand-lg bg-light p-2">
+      <div class="navbar-brand">
+        <img src="./icon.png" height="24" class="d-inline-block align-text-top">
+      </div>
+      SVG Viewer
+      <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="navbar-nav ms-auto">
+            <input class="form-control align-self-center" type="file" id="otio-file">
+          <a role="button" data-bs-toggle="modal" href="#aboutModal">
+            <i class="bi bi-question-circle ms-2" style="font-size: 2rem"></i>
+          </a>
+        </div>
+      </div>
+    </nav>
     <div class="container-fluid">
-      <p>OpenTimelineIO SVG viewer. This page is powered by Pyodide.</p>
-
-      <input type="file" id="otio-file" hidden=true/>
+      <div id="spinner-group" hidden="1">
+        <div class="spinner-border", role="status"></div>
+        <span class="ms-2" id="spinner-message"></span>
+      </div>
       <div id="svg-div"></div>
-      <p id="status">Loading...</p>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="aboutModalLabel">About</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <a href="https://github.com/JeanChristopheMorinPerso/otio-wasm">
+              <i class="bi bi-github"></i>
+              Source code
+            </a>
+            <p>
+              This is an app that allows you to load an OTIO file and to visualize
+              it in SVG format.
+            </p>
+            <p>
+              It runs entirely in your browser, which means it runs
+              a python interpreter using WebAssembly!
+            </p>
+            <p>
+              This project was made by <a href="https://github.com/JeanChristopheMorinPerso">Jean Christophe Morin</a>.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script type="text/javascript">
         var content = null;
 
         async function main(){
+            document.getElementById('spinner-group').hidden = false;
+            document.getElementById('spinner-message').innerHTML = "Loading Pyodide... UI will be blocked until it finishes loading";
             let pyodide = await loadPyodide();
 
+            document.getElementById('spinner-message').innerHTML = "Loading OpenTimelineIO...";
             await pyodide.loadPackage('https://jcmorin.dev/otio-wasm/OpenTimelineIO-0.15.0.dev1-cp310-cp310-emscripten_wasm32.whl');
 
-            document.getElementById("otio-file").hidden = false;
-            document.getElementById('status').hidden = true;
+            document.getElementById('spinner-group').hidden = true;
 
             document.getElementById("otio-file").onchange = function() {
-                document.getElementById('status').innerText = "Converting OTIO to SVG..."
-                document.getElementById('status').hidden = false;
+                document.getElementById('svg-div').hidden = true;
+                document.getElementById('spinner-message').innerText = "Converting OTIO to SVG..."
+                document.getElementById('spinner-group').hidden = false;
 
                 const otioFile = document.getElementById("otio-file").files[0];
 
@@ -52,10 +106,15 @@
                     svgElem.removeAttribute('height');
                     svgElem.removeAttribute('width');
 
+                    // Show the SVG div before computing the bounding box because
+                    // the bounding box can't be computed correctly if the element
+                    // is hidden.
+                    document.getElementById('svg-div').hidden = false;
+
                     const {x, y, width, height} = svgElem.getBBox();
                     svgElem.setAttribute("viewBox", `${x} ${y} ${width + 20} ${height + 20}`);
 
-                    document.getElementById('status').hidden = true;
+                    document.getElementById('spinner-group').hidden = true;
                 }
             }
       }
