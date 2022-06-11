@@ -86,20 +86,27 @@
 
                 const otioFile = document.getElementById("otio-file").files[0];
 
-                console.log(otioFile.name);
                 const reader = new FileReader();
                 reader.readAsBinaryString(otioFile);
 
                 reader.onload = evt => {
                     content = evt.target.result;
 
-                    var output = pyodide.runPython(`
-                        import js
-                        import opentimelineio
+                    try {
+                      var output = pyodide.runPython(`
+                          import js
+                          import opentimelineio
 
-                        timeline = opentimelineio.adapters.read_from_string(js.content)
-                        opentimelineio.adapters.write_to_string(timeline, adapter_name='svg')
-                    `)
+                          timeline = opentimelineio.adapters.read_from_string(js.content)
+                          opentimelineio.adapters.write_to_string(timeline, adapter_name='svg')
+                      `)
+                    } catch (err) {
+                      document.getElementById('spinner-group').hidden = true;
+
+                      document.getElementById('svg-div').innerHTML = `<p>An exception occured while rendering '${otioFile.name}':</p><pre>${err}</pre>`;
+                      document.getElementById('svg-div').hidden = false;
+                      return;
+                    }
 
                     document.getElementById('svg-div').innerHTML = output;
 
