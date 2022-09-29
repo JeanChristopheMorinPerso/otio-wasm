@@ -15,11 +15,11 @@ cd /src/pyodide/packages/opentimelineio
 echo '
 package:
   name: opentimelineio
-  version: 0.15.0.dev1
+  version: 0.16.0.dev1
 
 source:
-  url: "file://'"$repoPath"'/OpenTimelineIO-0.15.0.dev1.tar.gz"
-  sha256: '$(sha256sum "$repoPath/OpenTimelineIO-0.15.0.dev1.tar.gz" | cut -d' ' -f1)'
+  url: "file://'"$repoPath"'/OpenTimelineIO-0.16.0.dev1.tar.gz"
+  sha256: '$(sha256sum "$repoPath/OpenTimelineIO-0.16.0.dev1.tar.gz" | cut -d' ' -f1)'
   patches:
   - patches/patch.patch
 ' > meta.yaml
