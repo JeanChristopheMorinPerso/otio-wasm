@@ -75,7 +75,7 @@
             let pyodide = await loadPyodide();
 
             document.getElementById('spinner-message').innerHTML = "Loading OpenTimelineIO...";
-            await pyodide.loadPackage('http://jcmorin.dev/otio-wasm/OpenTimelineIO-0.16.0.dev1-cp310-cp310-emscripten_3_1_14_wasm32.whl');
+            await pyodide.loadPackage('https://jcmorin.dev/otio-wasm/OpenTimelineIO-0.16.0.dev1-cp310-cp310-emscripten_3_1_14_wasm32.whl');
 
             document.getElementById('spinner-group').hidden = true;
 
