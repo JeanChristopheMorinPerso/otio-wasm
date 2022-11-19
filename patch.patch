@@ -1,31 +1,41 @@
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 5c6b587..04cd292 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -112,8 +112,8 @@ else()
-     if (OTIO_PYTHON_INSTALL)
-         # If we're compiling for pybind, we can hide all our symbols, they'll only be called from pybind
-         # Note that this has no effect on Windows.
--        set(CMAKE_CXX_VISIBILITY_PRESET hidden)
--        set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
-+        # set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-+        # set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
- 
-         if(MSVC AND Python_VERSION_MAJOR VERSION_LESS 3)
-             # Statically link run-time library (vcruntime and msvcp)
 diff --git a/setup.py b/setup.py
-index dac4bb2..ba75860 100755
+index 14f93ca..a819b6d 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -68,7 +68,7 @@ class OTIO_build_ext(setuptools.command.build_ext.build_ext):
+@@ -79,8 +79,10 @@ class OTIO_build_ext(setuptools.command.build_ext.build_ext):
          if not os.path.exists(self.build_temp_dir):
              os.makedirs(self.build_temp_dir)
  
 -        debug = (self.debug or bool(os.environ.get("OTIO_CXX_DEBUG_BUILD")))
-+        debug = True
-         self.build_config = ('Debug' if debug else 'Release')
+-        self.build_config = ('Debug' if debug else 'Release')
++        self.build_config = os.environ.get("OTIO_CXX_BUILD_TYPE")
++        if not self.build_config:
++            debug = (self.debug or bool(os.environ.get("OTIO_CXX_DEBUG_BUILD")))
++            self.build_config = ('Debug' if debug else 'Release')
  
          self.cmake_preflight_check()
+         self.cmake_generate()
+@@ -264,13 +266,13 @@ class OTIO_build_py(setuptools.command.build_py.build_py):
+     def run(self):
+         super().run()
+ 
+-        if not self.dry_run and not self.editable_mode:
+-            # Only run when not in dry-mode (a dry run should not have any side effect)
+-            # and in non-editable mode. We don't want to edit files when in editable
+-            # mode because that could lead to modifications to the source files.
+-            # Note that setuptools will set self.editable_mode to True
+-            # when "pip install -e ." is run.
+-            _append_version_info_to_init_scripts(self.build_lib)
++        # if not self.dry_run and not self.editable_mode:
++        #     # Only run when not in dry-mode (a dry run should not have any side effect)
++        #     # and in non-editable mode. We don't want to edit files when in editable
++        #     # mode because that could lead to modifications to the source files.
++        #     # Note that setuptools will set self.editable_mode to True
++        #     # when "pip install -e ." is run.
++        #     _append_version_info_to_init_scripts(self.build_lib)
+ 
+ 
+ # copied from first paragraph of README.md
 diff --git a/src/py-opentimelineio/opentimelineio-bindings/CMakeLists.txt b/src/py-opentimelineio/opentimelineio-bindings/CMakeLists.txt
 index d37da36..5559ce3 100644
 --- a/src/py-opentimelineio/opentimelineio-bindings/CMakeLists.txt
@@ -38,3 +48,4 @@ index d37da36..5559ce3 100644
 +     -sDISABLE_EXCEPTION_CATCHING=0>
       $<$<CXX_COMPILER_ID:MSVC>: /EHsc>
  )
+ 

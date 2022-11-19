@@ -6,42 +6,47 @@ on:
       - "*"
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/pyodide/pyodide:0.20.0
 
     steps:
-    - name: Clone self
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
     - name: Clone OpenTimelineIO
       uses: actions/checkout@v3
       with:
         repository: AcademySoftwareFoundation/OpenTimelineIO
-        path: otio-repo
+        path: OpenTimelineIO
         submodules: 'recursive'
 
-    - name: Create sdist
-      run: |
-        python -m pip install build
-        python -m build -s --outdir . otio-repo
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
 
-    - name: Prepare environment
-      run: |
-        echo $(pwd)
-        ls -la
-        cd /src/pyodide
-        make
+    - uses: mymindstorm/setup-emsdk@v11
+      with:
+        version: '3.1.14'
 
-    - name: Build wasm wheel
-      run: ./build.sh $(pwd)
+    - run: pip install pyodide-build==0.21.0
+
+    - run: git apply < ../patch.patch
+      working-directory: OpenTimelineIO
+
+    - run: pyodide build --exports pyinit
+      working-directory: OpenTimelineIO
+      env:
+        VERBOSE: '1'
+        OTIO_CXX_BUILD_TYPE: RelWithDebInfo
 
     - uses: actions/upload-artifact@v3
       with:
         name: wheel
-        path: /src/pyodide/packages/opentimelineio/dist/*.whl
+        path: OpenTimelineIO/dist/*.whl
 
   publish:
     needs: ['build']
