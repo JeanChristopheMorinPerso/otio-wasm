@@ -44,22 +44,43 @@ jobs:
         OTIO_CXX_BUILD_TYPE: RelWithDebInfo
 
     - uses: actions/upload-artifact@v3
+      name: Upload wheel artifact
       with:
         name: wheel
         path: OpenTimelineIO/dist/*.whl
 
-  publish:
+    - name: Generate HTML
+      run: |
+        set -ex
+        python -m pip install packaging jinja2
+        python generateHtml.py OpenTimelineIO/dist/*.whl pages
+
+        cp OpenTimelineIO/dist/*.whl pages/
+        find public -mindepth 1 -not -name "*.in" -exec cp -v {} pages/ \;
+
+    - name: Upload pages artifact
+      uses: actions/upload-pages-artifact@v1
+      with:
+        path: pages
+
+  deploy:
     needs: ['build']
+
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v3
+    - name: Setup Pages
+      uses: actions/configure-pages@v2
 
-    - uses: actions/download-artifact@v3
-      with:
-        name: wheel
-        path: public
-
-    - uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: public
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v1
