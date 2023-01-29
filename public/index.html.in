@@ -7,6 +7,7 @@
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-expand-md bg-light p-2">
@@ -59,7 +60,7 @@
               This project was made by <a href="https://github.com/JeanChristopheMorinPerso">Jean Christophe Morin</a>.
             </p>
             <p>
-              Using OpenTimelineIO {{ version }} (commit: {{ commit }})
+              Using OpenTimelineIO {{ version }} (commit: {{ commit }}, <time id="commitTimestamp" title="{{ originalTimestamp }}" datetime="{{ utcTimestamp }}"></time>)
             </p>
           </div>
           <div class="modal-footer">
@@ -71,6 +72,8 @@
 
     <script type="text/javascript">
         var content = null;
+
+        document.getElementById('commitTimestamp').innerHTML = moment('{{ utcTimestamp }}').fromNow();
 
         async function main(){
             document.getElementById('spinner-group').hidden = false;
