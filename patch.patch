@@ -1,8 +1,16 @@
 diff --git a/setup.py b/setup.py
-index 14f93ca..a819b6d 100644
+index 14f93ca..693f2ef 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -79,8 +79,10 @@ class OTIO_build_ext(setuptools.command.build_ext.build_ext):
+@@ -18,6 +18,7 @@ import platform
+ import subprocess
+ import tempfile
+ import shutil
++import sysconfig
+ 
+ from setuptools import (
+     setup,
+@@ -79,10 +80,13 @@ class OTIO_build_ext(setuptools.command.build_ext.build_ext):
          if not os.path.exists(self.build_temp_dir):
              os.makedirs(self.build_temp_dir)
  
@@ -13,9 +21,23 @@ index 14f93ca..a819b6d 100644
 +            debug = (self.debug or bool(os.environ.get("OTIO_CXX_DEBUG_BUILD")))
 +            self.build_config = ('Debug' if debug else 'Release')
  
-         self.cmake_preflight_check()
+-        self.cmake_preflight_check()
++        # self.cmake_preflight_check()
++        self.announce(os.listdir(os.path.join(os.path.dirname(sys.executable), '..')), level=2)
          self.cmake_generate()
-@@ -264,13 +266,13 @@ class OTIO_build_py(setuptools.command.build_py.build_py):
+         self.cmake_install()
+ 
+@@ -115,6 +119,9 @@ class OTIO_build_ext(setuptools.command.build_ext.build_ext):
+             '-DBUILD_TESTING:BOOL=OFF',
+             # Python modules wil be installed by setuptools.
+             '-DOTIO_INSTALL_PYTHON_MODULES:BOOL=OFF',
++            # Not too sure why, but I have to pass that. This is pretty recent.
++            # Before it was working without issues.
++            f'-DPython_INCLUDE_DIR={sysconfig.get_path("include")}',
+         ]
+         if self.is_windows():
+             if self.is_mingw():
+@@ -264,13 +271,13 @@ class OTIO_build_py(setuptools.command.build_py.build_py):
      def run(self):
          super().run()
  
