@@ -1,3 +1,17 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3f7d70c..e2146dc 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -98,6 +98,9 @@ if(OTIO_PYTHON_INSTALL)
+         string(REPLACE "\\" "/" OTIO_RESOLVED_PYTHON_INSTALL_DIR ${OTIO_RESOLVED_PYTHON_INSTALL_DIR})
+     endif()
+ 
++    # Warning. This is dirty. PYTHON_MODULE_EXTENSION is usually set by Pybind11.
++    # Byt for whatever reasons it's being set to the current architecture instead of the wasm one.
++    set(PYTHON_MODULE_EXTENSION ".cpython-310-wasm32-emscripten.so")
+ else()
+     set(OTIO_RESOLVED_CXX_DYLIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+     message(STATUS "OTIO C++ installing to ${CMAKE_INSTALL_PREFIX}")
 diff --git a/setup.py b/setup.py
 index 14f93ca..693f2ef 100644
 --- a/setup.py
