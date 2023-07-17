@@ -61,7 +61,7 @@ jobs:
         find public -mindepth 1 -not -name "*.in" -exec cp -v {} pages/ \;
 
     - name: Upload pages artifact
-      uses: actions/upload-pages-artifact@v1
+      uses: actions/upload-pages-artifact@v2
       with:
         path: pages
 
