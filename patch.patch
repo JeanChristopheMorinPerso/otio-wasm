@@ -1,7 +1,26 @@
+diff --git a/pyproject.toml b/pyproject.toml
+index 1cd8845..34a3940 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -5,3 +5,6 @@ requires = [
+     "cmake>=3.12",
+ ]
+ build-backend = "setuptools.build_meta"
++
++[tool.cibuildwheel.pyodide]
++build-frontend = {name = "build", args = ["--exports", "whole_archive"]}
 diff --git a/setup.py b/setup.py
-index 14f93ca..693f2ef 100644
+index 658fde4..687cada 100644
 --- a/setup.py
 +++ b/setup.py
+@@ -18,6 +18,7 @@ import platform
+ import subprocess
+ import tempfile
+ import shutil
++import sysconfig
+ 
+ from setuptools import (
+     setup,
 @@ -79,10 +80,13 @@ class OTIO_build_ext(setuptools.command.build_ext.build_ext):
          if not os.path.exists(self.build_temp_dir):
              os.makedirs(self.build_temp_dir)
@@ -19,6 +38,15 @@ index 14f93ca..693f2ef 100644
          self.cmake_generate()
          self.cmake_install()
  
+@@ -106,6 +110,8 @@ class OTIO_build_ext(setuptools.command.build_ext.build_ext):
+             # See https://cmake.org/cmake/help/v3.20/module/FindPython.html#artifacts-specification # noqa: E501
+             # Also, be careful, CMake is case sensitive ;)
+             '-DPython_EXECUTABLE=' + sys.executable,
++            '-DPYTHON_INCLUDE_DIR=' + sysconfig.get_path('include'),
++            '-DPython_INCLUDE_DIR=' + sysconfig.get_path('include'),
+             '-DOTIO_PYTHON_INSTALL:BOOL=ON',
+             '-DOTIO_CXX_INSTALL:BOOL=OFF',
+             '-DOTIO_SHARED_LIBS:BOOL=OFF',
 diff --git a/src/py-opentimelineio/opentimelineio-bindings/CMakeLists.txt b/src/py-opentimelineio/opentimelineio-bindings/CMakeLists.txt
 index d37da36..5559ce3 100644
 --- a/src/py-opentimelineio/opentimelineio-bindings/CMakeLists.txt
