@@ -35,6 +35,7 @@ jobs:
     - uses: pypa/cibuildwheel@v2.20.0
       with:
         package-dir: OpenTimelineIO
+        output-dir: dist
       env:
         CIBW_PLATFORM: pyodide
 
@@ -57,15 +58,15 @@ jobs:
       name: Upload wheel artifact
       with:
         name: wheel
-        path: OpenTimelineIO/dist/*.whl
+        path: dist/*.whl
 
     - name: Generate HTML
       run: |
         set -ex
         python -m pip install packaging jinja2
-        python generateHtml.py OpenTimelineIO/dist/*.whl pages
+        python generateHtml.py dist/*.whl pages
 
-        cp OpenTimelineIO/dist/*.whl pages/
+        cp dist/*.whl pages/
         find public -mindepth 1 -not -name "*.in" -exec cp -v {} pages/ \;
 
     - name: Upload pages artifact
