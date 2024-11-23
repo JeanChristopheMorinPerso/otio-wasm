@@ -10,7 +10,7 @@ index 1cd8845..34a3940 100644
 +[tool.cibuildwheel.pyodide]
 +build-frontend = {name = "build", args = ["--exports", "whole_archive"]}
 diff --git a/setup.py b/setup.py
-index 658fde4..687cada 100644
+index 658fde4..c40bb5a 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -18,6 +18,7 @@ import platform
@@ -38,10 +38,12 @@ index 658fde4..687cada 100644
          self.cmake_generate()
          self.cmake_install()
  
-@@ -106,6 +110,8 @@ class OTIO_build_ext(setuptools.command.build_ext.build_ext):
+@@ -105,7 +109,9 @@ class OTIO_build_ext(setuptools.command.build_ext.build_ext):
+             # interpreter that was used to execute the setup.py.
              # See https://cmake.org/cmake/help/v3.20/module/FindPython.html#artifacts-specification # noqa: E501
              # Also, be careful, CMake is case sensitive ;)
-             '-DPython_EXECUTABLE=' + sys.executable,
+-            '-DPython_EXECUTABLE=' + sys.executable,
++            '-DPython_EXECUTABLE=' + os.path.join(sysconfig.get_config_var("prefix"), "bin", "python"),
 +            '-DPYTHON_INCLUDE_DIR=' + sysconfig.get_path('include'),
 +            '-DPython_INCLUDE_DIR=' + sysconfig.get_path('include'),
              '-DOTIO_PYTHON_INSTALL:BOOL=ON',
