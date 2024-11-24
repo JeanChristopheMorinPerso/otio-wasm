@@ -83,10 +83,12 @@
             document.getElementById('spinner-message').innerHTML = "Loading micropip";
             await pyodide.loadPackage("micropip");
 
-
             document.getElementById('spinner-message').innerHTML = "Loading OpenTimelineIO {{ version }} ({{ commit }}) and otio-svg-adapter...";
             const micropip = pyodide.pyimport("micropip");
             await micropip.install(['https://jcmorin.dev/otio-wasm/{{ wheel }}', 'otio-svg-adapter']);
+
+            // This is a hack. See https://github.com/pyodide/pyodide/pull/4836
+            pyodide._module.reportUndefinedSymbols();
 
             document.getElementById('spinner-group').hidden = true;
 
