@@ -29,8 +29,8 @@ jobs:
       with:
         python-version: '3.12'
 
-    - run: git apply < ../patch.patch
-      working-directory: OpenTimelineIO
+    # - run: git apply < ../patch.patch
+    #   working-directory: OpenTimelineIO
 
     - uses: pypa/cibuildwheel@v2.20.0
       with:
@@ -39,7 +39,7 @@ jobs:
       env:
         CIBW_PLATFORM: pyodide
         CIBW_BUILD_FRONTEND: 'build; args: --exports=whole_archive'
-        CIBW_ENVIRONMENT: LDFLAGS="-fwasm-exceptions $LDFLAGS --whole-archive" CXXFLAGS="-fwasm-exceptions $CXXFLAGS -Wl,--whole-archive"
+        CIBW_ENVIRONMENT: LDFLAGS="-fwasm-exceptions $LDFLAGS --whole-archive -sSIDE_MODULE=2" CXXFLAGS="-fwasm-exceptions $CXXFLAGS -sSIDE_MODULE=2"
 
     # - run: |
     #     pip install pyodide-build==0.22.1
