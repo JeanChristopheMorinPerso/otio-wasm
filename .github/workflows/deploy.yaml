@@ -39,7 +39,7 @@ jobs:
       env:
         CIBW_PLATFORM: pyodide
         CIBW_BUILD_FRONTEND: 'build; args: --exports=whole_archive'
-        CIBW_ENVIRONMENT: LDFLAGS="-fwasm-exceptions $LDFLAGS" CXXFLAGS="-fwasm-exceptions $CXXFLAGS"
+        CIBW_ENVIRONMENT: LDFLAGS="-fwasm-exceptions $LDFLAGS --whole-archive" CXXFLAGS="-fwasm-exceptions $CXXFLAGS -Wl,--whole-archive"
 
     # - run: |
     #     pip install pyodide-build==0.22.1
