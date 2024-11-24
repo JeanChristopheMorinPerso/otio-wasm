@@ -18,56 +18,52 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Clone OpenTimelineIO
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
-        repository: AcademySoftwareFoundation/OpenTimelineIO
+        repository: JeanChristopheMorinPerso/OpenTimelineIO
+        ref: switch_to_scikit_build_core
         path: OpenTimelineIO
         submodules: 'recursive'
 
     - uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: '3.12'
 
-    - run: |
-        pip install pyodide-build==0.22.1
-        echo EMSCRIPTEN_VERSION=$(pyodide config get emscripten_version) >> $GITHUB_ENV
-
-    - uses: mymindstorm/setup-emsdk@v12
+    - uses: pypa/cibuildwheel@v2.20.0
       with:
-        version: ${{ env.EMSCRIPTEN_VERSION }}
-
-    - run: git apply < ../patch.patch
-      working-directory: OpenTimelineIO
-
-    - run: pyodide build --exports pyinit
-      working-directory: OpenTimelineIO
+        package-dir: OpenTimelineIO
+        output-dir: dist
       env:
-        VERBOSE: '1'
-        OTIO_CXX_BUILD_TYPE: RelWithDebInfo
+        CIBW_PLATFORM: pyodide
+        # whole_archive is needed to make all symbols available.
+        CIBW_BUILD_FRONTEND: 'build; args: --exports=whole_archive'
+        # Note that -fwasm-exceptions doesn't work right now. It'll cause
+        # a bunch of issues with symbols not found. Quite weird.
+        CIBW_ENVIRONMENT: LDFLAGS="-fexceptions" CXXFLAGS="-fexceptions"
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       name: Upload wheel artifact
       with:
         name: wheel
-        path: OpenTimelineIO/dist/*.whl
+        path: dist/*.whl
 
     - name: Generate HTML
       run: |
         set -ex
         python -m pip install packaging jinja2
-        python generateHtml.py OpenTimelineIO/dist/*.whl pages
+        python generateHtml.py dist/*.whl pages
 
-        cp OpenTimelineIO/dist/*.whl pages/
+        cp dist/*.whl pages/
         find public -mindepth 1 -not -name "*.in" -exec cp -v {} pages/ \;
 
     - name: Upload pages artifact
-      uses: actions/upload-pages-artifact@v1
+      uses: actions/upload-pages-artifact@v3
       with:
         path: pages
 
   deploy:
     needs: ['build']
-
+    if: github.ref_name == 'main'
     permissions:
       pages: write      # to deploy to Pages
       id-token: write   # to verify the deployment originates from an appropriate source
@@ -81,8 +77,8 @@ jobs:
 
     steps:
     - name: Setup Pages
-      uses: actions/configure-pages@v3
+      uses: actions/configure-pages@v5
 
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v2
+      uses: actions/deploy-pages@v4
