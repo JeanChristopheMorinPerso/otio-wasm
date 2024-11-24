@@ -20,8 +20,8 @@ jobs:
     - name: Clone OpenTimelineIO
       uses: actions/checkout@v4
       with:
-        repository: AcademySoftwareFoundation/OpenTimelineIO
-        ref: v0.17.0
+        repository: JeanChristopheMorinPerso/OpenTimelineIO
+        ref: switch_to_scikit_build_core
         path: OpenTimelineIO
         submodules: 'recursive'
 
@@ -38,6 +38,7 @@ jobs:
         output-dir: dist
       env:
         CIBW_PLATFORM: pyodide
+        CIBW_BUILD_FRONTEND: 'build; args: --exports=whole_archive'
 
     # - run: |
     #     pip install pyodide-build==0.22.1
