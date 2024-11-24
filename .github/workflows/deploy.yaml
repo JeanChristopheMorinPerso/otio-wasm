@@ -63,7 +63,7 @@ jobs:
 
   deploy:
     needs: ['build']
-
+    if: github.ref_name == 'main'
     permissions:
       pages: write      # to deploy to Pages
       id-token: write   # to verify the deployment originates from an appropriate source
