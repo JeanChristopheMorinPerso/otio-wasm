@@ -29,8 +29,8 @@ jobs:
       with:
         python-version: '3.12'
 
-    # - run: git apply < ../patch.patch
-    #   working-directory: OpenTimelineIO
+    - run: git apply < ../patch.patch
+      working-directory: OpenTimelineIO
 
     - uses: pypa/cibuildwheel@v2.20.0
       with:

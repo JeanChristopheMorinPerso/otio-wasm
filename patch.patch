@@ -1,13 +1,23 @@
-diff --git a/src/py-opentimelineio/opentimelineio-bindings/CMakeLists.txt b/src/py-opentimelineio/opentimelineio-bindings/CMakeLists.txt
-index d37da36..5559ce3 100644
---- a/src/py-opentimelineio/opentimelineio-bindings/CMakeLists.txt
-+++ b/src/py-opentimelineio/opentimelineio-bindings/CMakeLists.txt
-@@ -34,6 +34,8 @@ target_compile_options(_otio PRIVATE
-      -Wno-range-loop-analysis>
-      $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-      -Wno-unused-value>
-+     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-+     -sDISABLE_EXCEPTION_CATCHING=0>
-      $<$<CXX_COMPILER_ID:MSVC>: /EHsc>
- )
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index fa74391..97c1c4e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -114,12 +114,12 @@ if(OTIO_SHARED_LIBS)
+ else()
+     message(STATUS "Building static libs")
+     set(OTIO_SHARED_OR_STATIC_LIB "STATIC")
+-    if (OTIO_PYTHON_INSTALL)
+-        # If we're compiling for pybind, we can hide all our symbols, they'll only be called from pybind
+-        # Note that this has no effect on Windows.
+-        set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+-        set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+-    endif()
++    # if (OTIO_PYTHON_INSTALL)
++    #     # If we're compiling for pybind, we can hide all our symbols, they'll only be called from pybind
++    #     # Note that this has no effect on Windows.
++    #     set(CMAKE_CXX_VISIBILITY_PRESET hidden)
++    #     set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
++    # endif()
+ endif()
  
+ set(OTIO_RESOLVED_CXX_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}")
