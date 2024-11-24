@@ -80,8 +80,13 @@
             document.getElementById('spinner-message').innerHTML = "Loading Pyodide... UI will be blocked until it finishes loading";
             let pyodide = await loadPyodide();
 
-            document.getElementById('spinner-message').innerHTML = "Loading OpenTimelineIO {{ version }} ({{ commit }})...";
-            await pyodide.loadPackage('https://jcmorin.dev/otio-wasm/{{ wheel }}');
+            document.getElementById('spinner-message').innerHTML = "Loading micropip";
+            await pyodide.loadPackage("micropip");
+
+
+            document.getElementById('spinner-message').innerHTML = "Loading OpenTimelineIO {{ version }} ({{ commit }}) and otio-svg-adapter...";
+            const micropip = pyodide.pyimport("micropip");
+            await micropip.install(['https://jcmorin.dev/otio-wasm/{{ wheel }}', 'otio-svg-adapter']);
 
             document.getElementById('spinner-group').hidden = true;
 
