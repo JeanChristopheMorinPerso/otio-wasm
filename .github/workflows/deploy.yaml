@@ -29,32 +29,17 @@ jobs:
       with:
         python-version: '3.12'
 
-    # - run: git apply < ../patch.patch
-    #   working-directory: OpenTimelineIO
-
     - uses: pypa/cibuildwheel@v2.20.0
       with:
         package-dir: OpenTimelineIO
         output-dir: dist
       env:
         CIBW_PLATFORM: pyodide
+        # whole_archive is needed to make all symbols available.
         CIBW_BUILD_FRONTEND: 'build; args: --exports=whole_archive'
+        # Note that -fwasm-exceptions doesn't work right now. It'll cause
+        # a bunch of issues with symbols not found. Quite weird.
         CIBW_ENVIRONMENT: LDFLAGS="-fexceptions" CXXFLAGS="-fexceptions"
-
-    # - run: |
-    #     pip install pyodide-build==0.22.1
-    #     echo EMSCRIPTEN_VERSION=$(pyodide config get emscripten_version) >> $GITHUB_ENV
-
-    # - uses: mymindstorm/setup-emsdk@v12
-    #   with:
-    #     version: ${{ env.EMSCRIPTEN_VERSION }}
-
-
-    # - run: pyodide build --exports pyinit
-    #   working-directory: OpenTimelineIO
-    #   env:
-    #     VERBOSE: '1'
-    #     OTIO_CXX_BUILD_TYPE: RelWithDebInfo
 
     - uses: actions/upload-artifact@v4
       name: Upload wheel artifact
