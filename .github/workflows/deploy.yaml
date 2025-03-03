@@ -29,7 +29,7 @@ jobs:
       with:
         python-version: '3.12'
 
-    - uses: pypa/cibuildwheel@v2.22.0
+    - uses: pypa/cibuildwheel@v2.23.0
       with:
         package-dir: OpenTimelineIO
         output-dir: dist
