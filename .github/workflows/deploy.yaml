@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Clone OpenTimelineIO
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: JeanChristopheMorinPerso/OpenTimelineIO
         ref: switch_to_scikit_build_core
